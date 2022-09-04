@@ -19,7 +19,7 @@ def create_model(architecture, n_inputs, n_outputs, pretrained=True):
 
     print('Creating model %s with %i inputs and %i outputs' % (architecture, n_inputs, n_outputs))
     Architecture = eval('torchvision.models.segmentation.%s' % architecture)
-    model = Architecture(weights=None)
+    model = Architecture(pretrained=pretrained)
 
     arch = architecture.split('_')[0]
     encoder = '_'.join(architecture.split('_')[1:])
