@@ -62,6 +62,7 @@ valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False, num_worker
 
 # --------------Load and set model and optimizer-------------------------------------
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+print('Using device:', device)
 
 n_classes = len(train_dataset.class_values)
 
