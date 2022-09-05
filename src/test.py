@@ -10,6 +10,7 @@ from dataset import OFFSEG
 from utils import convert_color
 from argparse import ArgumentParser
 from matplotlib import pyplot as plt
+from base_dataset import TRAVERSABILITY_COLOR_MAP
 
 
 def main():
@@ -23,7 +24,7 @@ def main():
     ds = OFFSEG(crop_size=args.img_size, split='test')
 
     # Initialize model with the best available weights
-    model_name = 'fcn_resnet50_lr_1e-05_bs_1_epoch_0_OFFSEG_iou_0.86.pth'
+    model_name = 'fcn_resnet50_lr_1e-05_bs_1_epoch_2_OFFSEG_iou_0.48.pth'
     # model_name = 'fcn_resnet50_lr_1e-05_bs_1_epoch_3_TraversabilityImages_iou_0.71.pth'
     model_path = os.path.join('..', 'models', model_name)
     model = torch.load(model_path, map_location=args.device).eval()
@@ -48,8 +49,8 @@ def main():
         mask = cv2.resize(mask.astype('float32'), size, interpolation=cv2.INTER_LINEAR).astype('int8')
 
         # result = convert_color(mask, data_cfg['color_map'])
-        result = convert_color(mask, {0: [0, 0, 0], 1: [0, 255, 0], 2: [255, 0, 0]})
-        gt_result = convert_color(gt_mask, {0: [0, 0, 0], 1: [0, 255, 0], 2: [255, 0, 0]})
+        result = convert_color(mask, TRAVERSABILITY_COLOR_MAP)
+        gt_result = convert_color(gt_mask, TRAVERSABILITY_COLOR_MAP)
         plt.figure(figsize=(20, 10))
         plt.subplot(1, 3, 1)
         plt.imshow(img_vis)

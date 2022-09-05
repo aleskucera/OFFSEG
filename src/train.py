@@ -54,8 +54,8 @@ parser.add_argument('--n_workers', type=int, default=os.cpu_count())
 args = parser.parse_args()
 args.img_size = tuple(args.img_size)
 
-train_dataset = OFFSEG(crop_size=args.img_size, split='train', size)
-valid_dataset = OFFSEG(crop_size=args.img_size, split='val', size)
+train_dataset = OFFSEG(crop_size=args.img_size, split='train', size=None)
+valid_dataset = OFFSEG(crop_size=args.img_size, split='val', size=None)
 
 train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.n_workers // 2)
 valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False, num_workers=args.n_workers // 2)
