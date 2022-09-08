@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 
-from train import train_model
+import train
 from parameter_parser import ParametersImage
 
 MODE = "train"
@@ -12,7 +12,7 @@ PARAMETERS = {
     "train": {"lr": 1e-5,
               "n_epochs": 2,
               "batch_size": 1,
-              "dataset_size": 1000,
+              "dataset_size": 10000,
               "img_size": (320, 512),
               "n_workers": os.cpu_count(),
               "architecture": "fcn_resnet50"},
@@ -34,7 +34,8 @@ def main():
 
     # Train or test the model
     if parameter_parser.mode == "train":
-        train_model(parameter_parser)
+        data = train.train_model(parameter_parser)
+        train.plot_training_history(data, save_path=MODELS_PATH)
     elif parameter_parser.mode == "test":
         pass
     else:
