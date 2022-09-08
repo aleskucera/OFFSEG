@@ -10,7 +10,7 @@ MODELS_PATH = os.path.join(os.path.dirname(__file__), "..", "models")
 
 PARAMETERS = {
     "train": {"lr": 1e-5,
-              "n_epochs": 2,
+              "n_epochs": 30,
               "batch_size": 1,
               "dataset_size": 10000,
               "img_size": (320, 512),

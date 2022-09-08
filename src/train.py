@@ -49,11 +49,11 @@ def create_model(architecture, n_inputs, n_outputs, pretrained=True):
 def train_model(p: ParametersImage) -> dict:
     # Create train dataset
     train_dataset = OFFSEG(path=p.data_path, split='train', crop_size=p.img_size, size=p.dataset_size)
-    train_dataloader = DataLoader(train_dataset, batch_size=p.batch_size, shuffle=True, num_workers=p.n_workers)
+    train_dataloader = DataLoader(train_dataset, batch_size=p.batch_size, shuffle=True, num_workers=p.n_workers // 2)
 
     # Create validation dataset
     val_dataset = OFFSEG(path=p.data_path, split='val', crop_size=p.img_size, size=p.dataset_size)
-    val_dataloader = DataLoader(val_dataset, batch_size=p.batch_size, shuffle=False, num_workers=p.n_workers)
+    val_dataloader = DataLoader(val_dataset, batch_size=p.batch_size, shuffle=False, num_workers=p.n_workers // 2)
 
     # Create model
     n_inputs = train_dataset[0][0].shape[0]
