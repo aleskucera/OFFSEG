@@ -101,7 +101,7 @@ def train_model(p: ParametersImage) -> None:
     data = {"train_loss": [], "metric": [], "time": None}
 
     # Create progress bar
-    pbar = tqdm(total=(len(train_dataloader) + len(val_dataloader)) * p.n_epochs)
+    pbar = tqdm(total=(len(train_dataset) + len(val_dataset)) * p.n_epochs)
 
     max_avg_metric = -np.Inf
     start_time = time.time()
