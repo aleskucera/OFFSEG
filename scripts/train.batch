@@ -10,6 +10,8 @@
 #SBATCH --mail-user=kuceral4@fel.cvut.cz  # where send info about job
 #SBATCH --mail-type=ALL                   # what to send, valid type values are NONE, BEGIN, END, FAIL, REQUEUE, ALL
 
+ulimit -n 4096
+
 # load modules
 ml PyTorch/1.11.0-foss-2021a-CUDA-11.3.1
 ml torchvision/0.12.0-foss-2021a-CUDA-11.3.1
