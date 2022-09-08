@@ -17,4 +17,4 @@ ml matplotlib/3.4.2-foss-2021a
 ml scikit-learn/0.24.2-foss-2021a
 
 # run the job
-python /home/kuceral4/OFFSEG/src/train.py --batch_size 1
+python /home/kuceral4/OFFSEG/src/main.py --batch_size 1
