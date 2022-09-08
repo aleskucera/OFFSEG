@@ -8,13 +8,13 @@ CONFIG_FILE = os.path.join(os.path.dirname(__file__), 'config.yaml')
 
 
 def configure_logging(clear_logs: bool = False):
+    # Make sure the logs directory exists
+    if not os.path.exists(LOGS_DIR):
+        os.makedirs(LOGS_DIR)
+        
     # Clear logs
     if clear_logs:
         _clear_logs()
-        
-    # Create logs directory
-    if not os.path.exists(LOGS_DIR):
-        os.makedirs(LOGS_DIR)
 
     # Load logging configuration
     if os.path.exists(CONFIG_FILE):
