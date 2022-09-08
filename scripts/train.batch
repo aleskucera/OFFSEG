@@ -24,5 +24,4 @@ python /home/kuceral4/OFFSEG/src/main.py --lr 1e-5 \
                                           --batch_size 10 \
                                           --n_epochs 50 \
                                           --architecture "fcn_resnet50" \
-                                          --img_size 320 512 \
-                                          --dataset_size 10000
+                                          --img_size 320 512
