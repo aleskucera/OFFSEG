@@ -6,11 +6,11 @@ import cv2
 import torch
 import numpy as np
 
-from dataset import OFFSEG
+from src.dataset.dataset import OFFSEG
 from utils import convert_color
 from argparse import ArgumentParser
 from matplotlib import pyplot as plt
-from base_dataset import TRAVERSABILITY_COLOR_MAP
+from src.dataset.base_dataset import TRAVERSABILITY_COLOR_MAP
 
 
 def main():

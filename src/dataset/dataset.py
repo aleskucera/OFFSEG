@@ -3,13 +3,12 @@ import os
 import cv2
 import numpy as np
 
-from utils.dataset_utils import visualize, convert_color
-
 from PIL import Image
+from .dataset_utils import visualize, convert_color
 from sklearn.model_selection import train_test_split
-from base_dataset import TRAVERSABILITY_LABELS, TRAVERSABILITY_COLOR_MAP, BaseDatasetImages, VOID_VALUE
+from .base_dataset import TRAVERSABILITY_LABELS, TRAVERSABILITY_COLOR_MAP, BaseDatasetImages, VOID_VALUE
 
-root_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+root_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), '../..'))
 
 
 class OFFSEG(BaseDatasetImages):
@@ -32,7 +31,7 @@ class OFFSEG(BaseDatasetImages):
         super(OFFSEG, self).__init__(ignore_label, base_size,
                                      crop_size, downsample_rate, scale_factor, mean, std)
         if path is None:
-            path = os.path.join(root_dir, 'dataset')
+            path = os.path.join(root_dir, '')
         assert os.path.exists(path)
         assert split in [None, 'train', 'val', 'test']
         self.path = path

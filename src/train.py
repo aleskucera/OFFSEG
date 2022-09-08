@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import time
 import torch
 import numpy as np
 import torchvision.models.segmentation
@@ -9,16 +10,17 @@ from utils import IoU
 from tqdm import tqdm
 from utils import DiceLoss
 from dataset import OFFSEG
-from argparse import ArgumentParser
+from matplotlib import pyplot as plt
 from torch.utils.data import DataLoader
+from parameter_parser import ParametersImage
 
 
 def create_model(architecture, n_inputs, n_outputs, pretrained=True):
     assert architecture in ['fcn_resnet50', 'fcn_resnet101', 'deeplabv3_resnet50', 'deeplabv3_resnet101',
                             'deeplabv3_mobilenet_v3_large', 'lraspp_mobilenet_v3_large']
 
-    print('Creating model %s with %i inputs and %i outputs' % (architecture, n_inputs, n_outputs))
-    Architecture = eval('torchvision.models.segmentation.%s' % architecture)
+    print(f'[INFO] Creating model {architecture} with {n_inputs} inputs and {n_outputs} outputs')
+    Architecture = eval(f'torchvision.models.segmentation.{architecture}')
     model = Architecture(pretrained=pretrained)
 
     arch = architecture.split('_')[0]
@@ -44,83 +46,121 @@ def create_model(architecture, n_inputs, n_outputs, pretrained=True):
     return model
 
 
-parser = ArgumentParser()
-parser.add_argument('--lr', type=float, default=1e-5)
-parser.add_argument('--architecture', type=str, default='fcn_resnet50')
-parser.add_argument('--batch_size', type=int, default=16)
-parser.add_argument('--img_size', nargs='+', default=(320, 512))
-parser.add_argument('--n_epochs', type=int, default=20)
-parser.add_argument('--n_workers', type=int, default=os.cpu_count())
-args = parser.parse_args()
-args.img_size = tuple(args.img_size)
+def train_model(p: ParametersImage) -> dict:
+    # Create train dataset
+    train_dataset = OFFSEG(path=p.data_path, split='train', crop_size=p.img_size, size=p.dataset_size)
+    train_dataloader = DataLoader(train_dataset, batch_size=p.batch_size, shuffle=True, num_workers=p.n_workers)
 
-train_dataset = OFFSEG(crop_size=args.img_size, split='train', size=None)
-valid_dataset = OFFSEG(crop_size=args.img_size, split='val', size=None)
+    # Create validation dataset
+    val_dataset = OFFSEG(path=p.data_path, split='val', crop_size=p.img_size, size=p.dataset_size)
+    val_dataloader = DataLoader(val_dataset, batch_size=p.batch_size, shuffle=False, num_workers=p.n_workers)
 
-train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.n_workers // 2)
-valid_loader = DataLoader(valid_dataset, batch_size=1, shuffle=False, num_workers=args.n_workers // 2)
+    # Create model
+    n_inputs = train_dataset[0][0].shape[0]
+    n_outputs = len(train_dataset.class_values)
+    model = create_model(p.architecture, n_inputs, n_outputs, pretrained=False)
+    model = model.to(p.device)
 
-# --------------Load and set model and optimizer-------------------------------------
-device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-print('Using device:', device)
+    # Create optimizer
+    optimizer = torch.optim.Adam(model.parameters(), lr=p.lr)
 
-n_classes = len(train_dataset.class_values)
+    # Create loss function
+    # criterion = torch.nn.CrossEntropyLoss(ignore_index=0)
+    criterion = DiceLoss(mode='multilabel', from_logits=True, ignore_index=0)
 
-n_inputs = train_dataset[0][0].shape[0]
+    # Create IoU metric
+    iou = IoU(threshold=0.5, activation='softmax2d', ignore_channels=[0])
 
-model = create_model(args.architecture, n_inputs, n_classes, pretrained=False)
-model = model.to(device)
+    # calculate steps per epoch for training and test set
+    train_steps = len(train_dataset) // p.batch_size
+    test_steps = len(val_dataset) // p.batch_size
 
-optimizer = torch.optim.Adam(params=model.parameters(), lr=args.lr)  # Create adam optimizer
+    # initialize a dictionary to store training history
+    data = {"train_loss": [], "metric": [], "time": None}
 
-# ----------------Train--------------------------------------------------------------------------
-# Dice/F1 score - https://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient
-# IoU/Jaccard score - https://en.wikipedia.org/wiki/Jaccard_index
-metric_fn = IoU(threshold=0.5, activation='softmax2d')
-criterion_fn = DiceLoss(mode='multilabel', from_logits=True, ignore_index=0)
+    # Create progress bar
+    pbar = tqdm(total=(len(train_dataloader) + len(val_dataloader)) * p.n_epochs)
 
-max_metric = -np.Inf
-for e in tqdm(range(args.n_epochs)):
-    # train epoch
-    model = model.train()
-    for itr, sample in tqdm(enumerate(train_loader)):
-        images, labels = sample
-        images, labels = images.to(device), labels.to(device)
+    max_avg_metric = -np.Inf
+    start_time = time.time()
+    for epoch in range(p.n_epochs):
 
-        pred = model(images)['out']  # make prediction
+        # initialize the total training and validation loss for the current epoch
+        total_train_loss = 0
+        total_val_metric = 0
 
-        optimizer.zero_grad()
-        loss = criterion_fn(pred, labels.long())  # Calculate loss
-        loss.backward()  # Backpropagate loss
-        optimizer.step()  # Apply gradient descent change to weight
+        # -------- TRAINING PHASE --------
+        model = model.train()
+        for i, (images, labels) in enumerate(train_dataloader):
+            # Move images and labels to device
+            images = images.to(p.device)
+            labels = labels.to(p.device)
 
-    # validation epoch
-    metrics = []
-    model = model.eval()
-    for itr, sample in tqdm(enumerate(valid_loader)):
-        images, labels = sample
-        images, labels = images.to(device), labels.int().to(device)
-        # convert tensor to int values
-        with torch.no_grad():
-            pred = model(images)['out']  # make prediction
-            metric1 = metric_fn(pred, labels)
-        metrics.append(metric1.cpu().numpy())
+            # Forward pass
+            outputs = model(images)
+            loss = criterion(outputs['out'], labels.long())
 
-    metric = np.mean(metrics)
+            # Backward pass
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-    # save better model
-    if max_metric < metric:  # Save model weight
-        max_metric = metric
-        name = '%s_lr_%g_bs_%d_epoch_%d_%s_iou_%.2f.pth' % \
-               (args.architecture,
-                args.lr, args.batch_size, e, 'OFFSEG', float(max_metric))
-        print("Saving Model:", name)
-        torch.save(model, os.path.join(os.path.dirname(__file__), '..', 'models', name))
+            # add the loss to the total training loss so far
+            total_train_loss += loss
 
-    print("Epoch: %i" % e)
-    print('Train loss: %f' % loss.data.cpu().numpy())
-    print('Validation metric: %.3f' % metric)
+            # Update progress bar
+            pbar.set_description(f'[INFO] Epoch: {epoch}, Phase: training, Loss {loss:.4f}')
+            pbar.update(1)
 
-    if e == 60:
-        optimizer.param_groups[0]['lr'] /= 10.0
-        print('Decrease decoder learning rate to %f !' % optimizer.param_groups[0]['lr'])
+        # -------- VALIDATION PHASE --------
+        model = model.eval()
+        for i, (images, labels) in enumerate(val_dataloader):
+            # Move images and labels to device
+            images = images.to(p.device)
+            labels = labels.to(p.device)
+
+            # convert tensor to int values
+            with torch.no_grad():
+                outputs = model(images)
+                metric = iou(outputs['out'], labels.long())
+                total_val_metric += metric
+
+            # Update progress bar
+            pbar.set_description(f'[INFO] Epoch: {epoch}, Phase: validation, IoU {metric:.2f}')
+            pbar.update(1)
+
+        avg_val_metric = total_val_metric / test_steps
+        avg_train_loss = total_train_loss / train_steps
+
+        # save the model if it is the best so far
+        if max_avg_metric < avg_val_metric:
+            max_avg_metric = avg_val_metric
+            name = f'{p.architecture}_lr_{p.lr}_bs_{p.batch_size}_epoch_{epoch}_OFFSEG_iou_{max_avg_metric:.2f}.pth'
+            print(f"[INFO] Saving Model: {name}")
+            torch.save(model, os.path.join(p.save_path, name))
+
+        # update our training history
+        data["train_loss"].append(avg_train_loss.cpu().detach().numpy())
+        data["metric"].append(avg_val_metric.cpu().detach().numpy())
+
+    # Close progress bar
+    pbar.close()
+
+    # display the total time needed to perform the training
+    end_time = time.time()
+    data["time"] = end_time - start_time
+    print(f"[INFO] total time taken to train the model: {end_time - start_time:.2f} seconds")
+    return data
+
+
+def plot_training_history(data: dict, save_path: str):
+    plt.style.use("ggplot")
+    plt.figure()
+    plt.plot(np.arange(0, len(data["train_loss"])), data["train_loss"], label="train_loss")
+    plt.plot(np.arange(0, len(data["metric"])), data["metric"], label="metric")
+    plt.title("Training Loss and Metric")
+    plt.xlabel("Epoch #")
+    plt.ylabel("Loss/Metric")
+    plt.legend(loc="lower left")
+    plt.savefig(os.path.join(save_path, 'training_history.png'))
+    # plt.show()
