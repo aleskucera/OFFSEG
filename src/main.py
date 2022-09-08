@@ -23,7 +23,7 @@ PARAMETERS = {
     "train": {"lr": 1e-5,
               "n_epochs": 30,
               "batch_size": 1,
-              "dataset_size": 10,
+              "dataset_size": None,
               "img_size": (320, 512),
               "n_workers": os.cpu_count(),
               "architecture": "fcn_resnet50"},

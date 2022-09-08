@@ -52,8 +52,10 @@ class ParametersImage(object):
     def _parse_args(parameters: dict, mode: str = 'train') -> argparse.Namespace:
         parser = argparse.ArgumentParser()
         for key, value in parameters[mode].items():
-            if type(value) == tuple:
+            if type(value) == tuple:  # if the value is a tuple, it is an image size
                 parser.add_argument(f"--{key}", type=type(value[0]), nargs=len(value), default=value)
+            elif value is None:  # if the value is None, it is dataset_size
+                parser.add_argument(f"--{key}", type=int, default=value)
             else:
                 parser.add_argument(f"--{key}", type=type(value), default=value)
         return parser.parse_args()
