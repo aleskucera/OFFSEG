@@ -21,7 +21,7 @@ ml scikit-learn/0.24.2-foss-2021a
 
 # run the job
 python /home/kuceral4/OFFSEG/src/main.py  --lr 1e-5 \
-                                          --batch_size 50 \
+                                          --batch_size 1 \
                                           --n_epochs 15 \
                                           --architecture "fcn_resnet50" \
                                           --img_size 320 512  \
