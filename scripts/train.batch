@@ -10,6 +10,10 @@
 #SBATCH --mail-user=kuceral4@fel.cvut.cz  # where send info about job
 #SBATCH --mail-type=ALL                   # what to send, valid type values are NONE, BEGIN, END, FAIL, REQUEUE, ALL
 
+export PYTHONPATH="$( dirname -- "$0"; )/..":$PYTHONPATH
+
+echo "Added $( dirname -- "$0"; )/.. to PYTHONPATH"
+
 ulimit -n 8192
 
 # load modules
