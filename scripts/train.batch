@@ -10,9 +10,16 @@
 #SBATCH --mail-user=kuceral4@fel.cvut.cz  # where send info about job
 #SBATCH --mail-type=ALL                   # what to send, valid type values are NONE, BEGIN, END, FAIL, REQUEUE, ALL
 
-export PYTHONPATH="$( dirname -- "$0"; )/..":$PYTHONPATH
+path=$(realpath "${BASH_SOURCE:-$0}")
+echo "The absolute path is $path"
+echo "-----------------------------------"
+DIR_PATH=$(dirname $path)
+echo "The directory path is $DIR_PATH"
+PROJECT_PATH=$(dirname $DIR_PATH)
+echo "The project path is $PROJECT_PATH"
 
-echo "Added $( dirname -- "$0"; )/.. to PYTHONPATH"
+export PYTHONPATH=$PROJECT_PATH:$PYTHONPATH
+
 
 ulimit -n 8192
 
