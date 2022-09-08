@@ -52,5 +52,8 @@ class ParametersImage(object):
     def _parse_args(parameters: dict, mode: str = 'train') -> argparse.Namespace:
         parser = argparse.ArgumentParser()
         for key, value in parameters[mode].items():
-            parser.add_argument(f"--{key}", type=type(value), default=value)
+            if type(value) == tuple:
+                parser.add_argument(f"--{key}", type=type(value[0]), nargs=len(value), default=value)
+            else:
+                parser.add_argument(f"--{key}", type=type(value), default=value)
         return parser.parse_args()

@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 import os
+import sys
 import train
 import logging
+
+# add the parent directory to the path
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from log import configure_logging
 from parameter_parser import ParametersImage
