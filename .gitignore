@@ -1,2 +1,8 @@
-data
-models
+# Dataset
+data/
+
+# Generated models and training results
+models/
+
+# Logs
+log/logs/

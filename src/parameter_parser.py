@@ -1,9 +1,13 @@
 import torch
+import logging
 import argparse
 
 
 class ParametersImage(object):
     def __init__(self, mode: str = 'train', parameters: dict = None, data_path: str = None, save_path: str = None):
+        # Create logger
+        logger = logging.getLogger(__name__)
+
         # parse arguments from command line
         assert mode in ['train', 'test'], "[ERROR] Mode must be 'train' or 'test'"
         assert parameters is not None, "[ERROR] Parameters must be provided"
@@ -19,6 +23,7 @@ class ParametersImage(object):
         if mode == "train":
             self.lr = args.lr
             self.n_epochs = args.n_epochs
+            self.plot_path = args.plot_path
             self.n_workers = args.n_workers
             self.batch_size = args.batch_size
             self.architecture = args.architecture
@@ -33,6 +38,8 @@ class ParametersImage(object):
             self.device = torch.device('cuda')
         else:
             self.device = torch.device('cpu')
+
+        logger.debug(f"Parameters: {self.__dict__}")
 
     @staticmethod
     def _parse_args(parameters: dict, mode: str = 'train') -> argparse.Namespace:

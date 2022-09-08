@@ -3,6 +3,7 @@
 import os
 import time
 import torch
+import logging
 import numpy as np
 import torchvision.models.segmentation
 
@@ -16,10 +17,12 @@ from parameter_parser import ParametersImage
 
 
 def create_model(architecture, n_inputs, n_outputs, pretrained=True):
+    # Create logger
+    logger = logging.getLogger(__name__)
     assert architecture in ['fcn_resnet50', 'fcn_resnet101', 'deeplabv3_resnet50', 'deeplabv3_resnet101',
                             'deeplabv3_mobilenet_v3_large', 'lraspp_mobilenet_v3_large']
 
-    print(f'[INFO] Creating model {architecture} with {n_inputs} inputs and {n_outputs} outputs')
+    logger.info(f'Creating model {architecture} with {n_inputs} inputs and {n_outputs} outputs')
     Architecture = eval(f'torchvision.models.segmentation.{architecture}')
     model = Architecture(pretrained=pretrained)
 
@@ -46,7 +49,10 @@ def create_model(architecture, n_inputs, n_outputs, pretrained=True):
     return model
 
 
-def train_model(p: ParametersImage) -> dict:
+def train_model(p: ParametersImage):
+    # Create logger
+    logger = logging.getLogger(__name__)
+
     # Create train dataset
     train_dataset = OFFSEG(path=p.data_path, split='train', crop_size=p.img_size, size=p.dataset_size)
     train_dataloader = DataLoader(train_dataset, batch_size=p.batch_size, shuffle=True, num_workers=p.n_workers // 2)
@@ -85,6 +91,8 @@ def train_model(p: ParametersImage) -> dict:
     start_time = time.time()
     for epoch in range(p.n_epochs):
 
+        logger.info(f"Entering epoch {epoch + 1} of {p.n_epochs} epochs")
+
         # initialize the total training and validation loss for the current epoch
         total_train_loss = 0
         total_val_metric = 0
@@ -109,7 +117,7 @@ def train_model(p: ParametersImage) -> dict:
             total_train_loss += loss
 
             # Update progress bar
-            pbar.set_description(f'[INFO] Epoch: {epoch}, Phase: training, Loss {loss:.4f}')
+            pbar.set_description(f'Epoch: {epoch}, Phase: training, Loss {loss:.4f}')
             pbar.update(1)
 
         # -------- VALIDATION PHASE --------
@@ -126,17 +134,22 @@ def train_model(p: ParametersImage) -> dict:
                 total_val_metric += metric
 
             # Update progress bar
-            pbar.set_description(f'[INFO] Epoch: {epoch}, Phase: validation, IoU {metric:.2f}')
+            pbar.set_description(f'Epoch: {epoch}, Phase: validation, IoU {metric:.2f}')
             pbar.update(1)
 
         avg_val_metric = total_val_metric / test_steps
         avg_train_loss = total_train_loss / train_steps
 
+        logger.debug(f"Average training loss: {avg_train_loss:.4f}")
+        logger.debug(f"Average validation IoU: {avg_val_metric:.4f}")
+
         # save the model if it is the best so far
         if max_avg_metric < avg_val_metric:
             max_avg_metric = avg_val_metric
-            name = f'{p.architecture}_lr_{p.lr}_bs_{p.batch_size}_epoch_{epoch}_OFFSEG_iou_{max_avg_metric:.2f}.pth'
-            print(f"[INFO] Saving Model: {name}")
+            name = f'{p.architecture}_lr_{p.lr}' \
+                   f'_bs_{p.batch_size}_epoch_{epoch}' \
+                   f'_ds_{p.dataset_size}_iou_{max_avg_metric:.2f}.pth'
+            logger.info(f"Saving Model: {name}")
             torch.save(model, os.path.join(p.save_path, name))
 
         # update our training history
@@ -149,18 +162,25 @@ def train_model(p: ParametersImage) -> dict:
     # display the total time needed to perform the training
     end_time = time.time()
     data["time"] = end_time - start_time
-    print(f"[INFO] total time taken to train the model: {end_time - start_time:.2f} seconds")
-    return data
+    logger.info(f"Training completed in {data['time']:.2f} seconds")
+    plot_training_history(data, p.plot_path)
 
 
-def plot_training_history(data: dict, save_path: str):
+def plot_training_history(data: dict, plot_path: str):
+    # Create logger
+    logger = logging.getLogger(__name__)
+    logger.info(f"Plotting training history and saving to {plot_path}")
+
+    os.makedirs(plot_path, exist_ok=True)
+
+    # plot the training loss and accuracy
     plt.style.use("ggplot")
     plt.figure()
     plt.plot(np.arange(0, len(data["train_loss"])), data["train_loss"], label="train_loss")
     plt.plot(np.arange(0, len(data["metric"])), data["metric"], label="metric")
     plt.title("Training Loss and Metric")
-    plt.xlabel("Epoch #")
-    plt.ylabel("Loss/Metric")
-    plt.legend(loc="lower left")
-    plt.savefig(os.path.join(save_path, 'training_history.png'))
+    plt.xlabel("Epoch [-]")
+    plt.ylabel("Loss/Metric [-]")
+    plt.legend(loc="best")
+    plt.savefig(plot_path)
     # plt.show()
