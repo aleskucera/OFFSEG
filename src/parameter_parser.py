@@ -5,25 +5,32 @@ import argparse
 
 class ParametersImage(object):
     def __init__(self, mode: str = 'train', parameters: dict = None, data_path: str = None, save_path: str = None):
+        """
+        ParametersImage is a class that parses the command line arguments and stores them in a dictionary
+
+        :param mode: 'train' or 'test'
+        :param parameters: dictionary of parameters which are used to set the default values
+        :param data_path: path to the dataset
+        :param save_path: path where to save the models
+        """
+
         # Create logger
         logger = logging.getLogger(__name__)
 
         # parse arguments from command line
         assert mode in ['train', 'test'], "[ERROR] Mode must be 'train' or 'test'"
         assert parameters is not None, "[ERROR] Parameters must be provided"
-        assert save_path is not None, "[ERROR] Save_path must be provided"
 
         args = self._parse_args(parameters, mode)
 
         # set the parameters
         self.mode = mode
         self.data_path = data_path
-        self.save_path = save_path
         self.img_size = args.img_size
         if mode == "train":
             self.lr = args.lr
+            self.save_path = save_path
             self.n_epochs = args.n_epochs
-            self.plot_path = args.plot_path
             self.n_workers = args.n_workers
             self.batch_size = args.batch_size
             self.architecture = args.architecture

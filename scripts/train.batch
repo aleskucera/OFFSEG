@@ -19,4 +19,8 @@ ml matplotlib/3.4.2-foss-2021a
 ml scikit-learn/0.24.2-foss-2021a
 
 # run the job
-python /home/kuceral4/OFFSEG/src/main.py --batch_size 10
+python /home/kuceral4/OFFSEG/src/main.py --lr 1e-5 \
+                                          --batch_size 10 \
+                                          --n_epochs 50 \
+                                          --architecture "fcn_resnet50" \
+                                          --img_size "(320, 512)"

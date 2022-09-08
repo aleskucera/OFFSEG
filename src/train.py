@@ -17,6 +17,15 @@ from parameter_parser import ParametersImage
 
 
 def create_model(architecture, n_inputs, n_outputs, pretrained=True):
+    """
+    Creates a model based on the architecture.
+
+    :param architecture: Architecture of the model
+    :param n_inputs: Number of input channels
+    :param n_outputs: Number of output channels
+    :param pretrained: Use pretrained weights
+    """
+
     # Create logger
     logger = logging.getLogger(__name__)
     assert architecture in ['fcn_resnet50', 'fcn_resnet101', 'deeplabv3_resnet50', 'deeplabv3_resnet101',
@@ -49,7 +58,14 @@ def create_model(architecture, n_inputs, n_outputs, pretrained=True):
     return model
 
 
-def train_model(p: ParametersImage):
+def train_model(p: ParametersImage) -> None:
+    """
+    Train the model, save the weights of the model and save plot of the training process.
+
+    :param p: ParametersImage object where are stored all the parameters
+    :return: None
+    """
+
     # Create logger
     logger = logging.getLogger(__name__)
 
@@ -150,6 +166,7 @@ def train_model(p: ParametersImage):
                    f'_bs_{p.batch_size}_epoch_{epoch}' \
                    f'_ds_{p.dataset_size}_iou_{max_avg_metric:.2f}.pth'
             logger.info(f"Saving Model: {name}")
+            os.makedirs(p.save_path, exist_ok=True)
             torch.save(model, os.path.join(p.save_path, name))
 
         # update our training history
@@ -163,15 +180,46 @@ def train_model(p: ParametersImage):
     end_time = time.time()
     data["time"] = end_time - start_time
     logger.info(f"Training completed in {data['time']:.2f} seconds")
-    plot_training_history(data, p.plot_path)
+    plot_training_history(p, data)
 
 
-def plot_training_history(data: dict, plot_path: str):
+def plot_training_history(p: ParametersImage, data: dict, optimizer: str = 'Adam', loss: str = 'DiceLoss',
+                          metric: str = 'IoU'):
+    """
+    Creates and saves a plot of the training history of the model.
+    The name of the plot is in following format:
+        {architecture}
+        _lr_{learning_rate}
+        _bs_{batch_size}
+        _ds_{dataset_size}
+        _is_{images_size}
+        _opt_{optimizer}
+        _l_{learning_rate}
+        _m_{metric}.png
+
+    :param p: ParametersImage
+    :param data: dict
+    :param optimizer: str
+    :param loss: str
+    :param metric: str
+    :return: None
+    """
+
+    # Create name of the plot
+    name = f'{p.architecture}' \
+           f'_lr_{p.lr}' \
+           f'_ds_{p.dataset_size}' \
+           f'_is_{p.img_size}' \
+           f'_opt_{optimizer}' \
+           f'_l_{loss}' \
+           f'_m_{metric}.png'
+    plot_dir = os.path.join(os.path.dirname(__file__), "..", "log", "figures")
+    os.makedirs(plot_dir, exist_ok=True)
+    plot_path = os.path.join(plot_dir, name)
+
     # Create logger
     logger = logging.getLogger(__name__)
     logger.info(f"Plotting training history and saving to {plot_path}")
-
-    os.makedirs(plot_path, exist_ok=True)
 
     # plot the training loss and accuracy
     plt.style.use("ggplot")

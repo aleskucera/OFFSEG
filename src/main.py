@@ -22,8 +22,7 @@ PARAMETERS = {
               "dataset_size": 10,
               "img_size": (320, 512),
               "n_workers": os.cpu_count(),
-              "architecture": "fcn_resnet50",
-              "plot_path": os.path.join(os.path.dirname(__file__), "..", "log", "images", "train_history.png"), },
+              "architecture": "fcn_resnet50"},
     "test": {"lr": 1e-5,
              "img_size": (320, 512)}
 }
