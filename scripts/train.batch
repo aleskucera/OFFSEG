@@ -1,17 +1,17 @@
 #!/bin/bash
 
 #SBATCH --nodes=1                         # 1 node
-#SBATCH --ntasks-per-node=128             # 64 tasks per node
-#SBATCH --time=4:00:00                    # time limits: 1 hour
+#SBATCH --ntasks-per-node=512             # 64 tasks per node
+#SBATCH --time=8:00:00                    # time limits: 8 hours
 #SBATCH --error=myJob.err                 # standard error file
 #SBATCH --output=myJob.out                # standard output file
 #SBATCH --partition=amdgpu                # partition name
-#SBATCH --gres=gpu:2                      # number of GPUs per node
+#SBATCH --gres=gpu:3                      # number of GPUs per node
 #SBATCH --mail-user=kuceral4@fel.cvut.cz  # where send info about job
 #SBATCH --mail-type=ALL                   # what to send, valid type values are NONE, BEGIN, END, FAIL, REQUEUE, ALL
 
 # Change limit for opened files
-ulimit -n 8192
+ulimit -n 16384
 
 # load modules
 ml PyTorch/1.11.0-foss-2021a-CUDA-11.3.1
@@ -21,7 +21,7 @@ ml scikit-learn/0.24.2-foss-2021a
 
 # run the job
 python /home/kuceral4/OFFSEG/src/main.py  --lr 1e-5 \
-                                          --batch_size 10 \
+                                          --batch_size 30 \
                                           --n_epochs 15 \
                                           --architecture "fcn_resnet50" \
                                           --img_size 320 512  \
