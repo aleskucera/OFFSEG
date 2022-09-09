@@ -134,7 +134,7 @@ def train_model(p: ParametersImage) -> None:
 
             # Update progress bar
             pbar.set_description(f'Epoch: {epoch}, Phase: training, Loss {loss:.4f}')
-            pbar.update(1)
+            pbar.update(p.batch_size)
 
         # -------- VALIDATION PHASE --------
         model = model.eval()
@@ -151,7 +151,7 @@ def train_model(p: ParametersImage) -> None:
 
             # Update progress bar
             pbar.set_description(f'Epoch: {epoch}, Phase: validation, IoU {metric:.2f}')
-            pbar.update(1)
+            pbar.update(p.batch_size)
 
         avg_val_metric = total_val_metric / test_steps
         avg_train_loss = total_train_loss / train_steps
