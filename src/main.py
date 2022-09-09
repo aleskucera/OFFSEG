@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+import test
 import train
 import logging
 
@@ -16,7 +17,7 @@ configure_logging(clear_logs=CLEAR_LOGS)
 logger = logging.getLogger(__name__)
 
 # Set the parameters
-MODE = "train"
+MODE = "test"
 DATASET_PATH = os.path.join(os.path.dirname(__file__), "..", "data")
 MODELS_PATH = os.path.join(os.path.dirname(__file__), "..", "models")
 PARAMETERS = {
@@ -27,8 +28,8 @@ PARAMETERS = {
               "img_size": (320, 512),
               "n_workers": os.cpu_count(),
               "architecture": "fcn_resnet50"},
-    "test": {"lr": 1e-5,
-             "img_size": (320, 512)}
+    "test": {"img_size": (320, 512),
+             "model_name": "fcn_resnet50_lr_1e-05_bs_1_epoch_16_ds_10_iou_0.98.pth"}
 }
 
 
@@ -51,7 +52,7 @@ def main():
     if parameter_parser.mode == "train":
         train.train_model(parameter_parser)
     elif parameter_parser.mode == "test":
-        pass
+        test.test_model(parameter_parser)
 
 
 if __name__ == '__main__':

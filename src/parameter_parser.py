@@ -36,7 +36,7 @@ class ParametersImage(object):
             self.architecture = args.architecture
             self.dataset_size = args.dataset_size
         elif mode == "test":
-            self.dataset = args.dataset
+            self.model_name = args.model_name
         else:
             raise Exception("Invalid type")
 
