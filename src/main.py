@@ -17,7 +17,7 @@ configure_logging(clear_logs=CLEAR_LOGS)
 logger = logging.getLogger(__name__)
 
 # Set the parameters
-MODE = "test"
+MODE = "train"
 DATASET_PATH = os.path.join(os.path.dirname(__file__), "..", "data")
 MODELS_PATH = os.path.join(os.path.dirname(__file__), "..", "models")
 PARAMETERS = {
