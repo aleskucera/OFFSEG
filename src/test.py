@@ -1,61 +1,86 @@
-#!/usr/bin/env python
-
-import os
 import cv2
 import torch
-import logging
 import numpy as np
+import albumentations as A
+import torch.nn.functional as F
+import matplotlib.pyplot as plt
 
-from dataset import OFFSEG
-from dataset import visualize, convert_color
-from dataset import TRAVERSABILITY_COLOR_MAP
-from torch.utils.data import DataLoader
+from dataset import OFFSEGDataset
+from torchvision import transforms as T
 from parameter_parser import ParametersImage
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def test_model(p: ParametersImage) -> None:
-    """
-    Test the model and visualize the predictions
 
-    :param p: Parameters object
-    :return: None
-    """
-
-    # Create logger
-    logger = logging.getLogger(__name__)
-
-    # Create test dataset
-    test_dataset = OFFSEG(path=p.data_path, split='test', crop_size=p.img_size)
-
-    # Load model
-    model = torch.load(os.path.join(os.path.dirname(__file__), "..", "models", p.model_name))
+def test_model():
+    # Load the model
+    model = torch.load('Unet-Mobilenet_v2_mIoU-0.688.pt')
     model.eval()
 
-    for i in range(5):
-        # Apply inference preprocessing transforms
-        image, gt_mask = test_dataset[i]
-        img_vis = np.uint8(255 * (image * test_dataset.std + test_dataset.mean))
-        if test_dataset.split == 'test':
-            image = image.transpose((2, 0, 1))  # (H x W x C) -> (C x H x W)
-        batch = torch.from_numpy(image).unsqueeze(0).to(p.device)
+    # Load the dataset
+    mean = [0.485, 0.456, 0.406]
+    std = [0.229, 0.224, 0.225]
+    t_test = A.Resize(320, 512, interpolation=cv2.INTER_NEAREST)
+    dataset = OFFSEGDataset(split='test', mean=mean, std=std, transform=t_test)
 
-        # Use the model and visualize the prediction
-        with torch.no_grad():
-            output = model(batch)
-        pred = torch.softmax(output['out'], dim=1)
-        pred = pred.squeeze(0).cpu().numpy()
+    # Load the image
+    image, label = dataset[0]
 
-        # Find the class with the highest probability
-        mask = np.argmax(pred, axis=0)
-        gt_mask = np.argmax(gt_mask, axis=0)
+    # Predict the image
+    pred_mask, score = predict_image_mask_miou(model, image, label)
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(20, 10))
+    ax1.imshow(image)
+    ax1.set_title('Picture')
 
-        # Resize the mask to the image size
-        size = (p.img_size[1], p.img_size[0])
-        mask = cv2.resize(mask.astype('float32'), size, interpolation=cv2.INTER_LINEAR).astype('int8')
+    ax2.imshow(label)
+    ax2.set_title('Ground truth')
+    ax2.set_axis_off()
 
-        # result = convert_color(mask, data_cfg['color_map'])
-        result = convert_color(mask, TRAVERSABILITY_COLOR_MAP)
-        gt_result = convert_color(gt_mask, TRAVERSABILITY_COLOR_MAP)
+    ax3.imshow(pred_mask)
+    ax3.set_title('UNet-MobileNet | mIoU {:.3f}'.format(score))
+    ax3.set_axis_off()
+    plt.show()
 
-        # Visualize the prediction
-        visualize(img=img_vis, label=result, gt_label=gt_result)
+
+def predict_image_mask_miou(model, image, mask, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
+    model.eval()
+    t = T.Compose([T.ToTensor(), T.Normalize(mean, std)])
+    image = t(image)
+    model.to(device)
+    image = image.to(device)
+    mask = mask.to(device)
+    with torch.no_grad():
+        image = image.unsqueeze(0)
+        mask = mask.unsqueeze(0)
+
+        output = model(image)
+        score = mIoU(output, mask)
+        masked = torch.argmax(output, dim=1)
+        masked = masked.cpu().squeeze(0)
+    return masked, score
+
+
+def mIoU(pred_mask, mask, smooth=1e-10, n_classes=5):
+    with torch.no_grad():
+        pred_mask = F.softmax(pred_mask, dim=1)
+        pred_mask = torch.argmax(pred_mask, dim=1)
+        pred_mask = pred_mask.contiguous().view(-1)
+        mask = mask.contiguous().view(-1)
+        iou_per_class = []
+        for clas in range(0, n_classes):  # loop per pixel class
+            true_class = pred_mask == clas
+            true_label = mask == clas
+
+            if true_label.long().sum().item() == 0:  # no exist label in this loop
+                iou_per_class.append(np.nan)
+            else:
+                intersect = torch.logical_and(true_class, true_label).sum().float().item()
+                union = torch.logical_or(true_class, true_label).sum().float().item()
+
+                iou = (intersect + smooth) / (union + smooth)
+                iou_per_class.append(iou)
+        return np.nanmean(iou_per_class)
+
+
+if __name__ == '__main__':
+    test_model()
