@@ -14,8 +14,8 @@
 
 ulimit -n 100000
 
-singularity run --nv /home/kuceral4/OFFSEG/singularity/conda_image.sif \
-            python /home/kuceral4/OFFSEG/src/main.py  --lr 1e-3 \
-                                          --batch_size 64 \
-                                          --n_epochs 25 \
-                                          --img_size 320 512
+singularity run --nv singularity/conda_image.sif \
+            python src/main.py  --lr 1e-3 \
+                                --batch_size 64 \
+                                --n_epochs 25 \
+                                --img_size 320 512
