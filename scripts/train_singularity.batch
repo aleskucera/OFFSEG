@@ -16,6 +16,6 @@ ulimit -n 100000
 
 singularity run --nv conda_image.sif \
             python ../src/main.py  --lr 1e-3 \
-                                --batch_size 64 \
-                                --n_epochs 25 \
-                                --img_size 320 512
+                                  --batch_size 64 \
+                                  --n_epochs 25 \
+                                  --img_size 320 512
