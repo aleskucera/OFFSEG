@@ -1,0 +1,17 @@
+train_params:
+  learning_rate: 0.001    # 1e-3
+  weight_decay: 0.0001    # 1e-4
+  n_epochs: 100
+  batch_size: 64
+  dataset_size: None
+  image_size: [ 320, 512 ]
+  ignore_labels: [ 0 ]
+
+train_params_dev:
+  learning_rate: 0.001    # 1e-3
+  weight_decay: 0.0001    # 1e-4
+  n_epochs: 10
+  batch_size: 1
+  dataset_size: 100
+  image_size: [ 320, 512 ]
+  ignore_labels: [ 0 ]

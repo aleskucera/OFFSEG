@@ -1,0 +1,8 @@
+root_dir: ''
+src_dir: 'src'
+dataset_dir: 'data'
+config_dir: 'config'
+models_dir: 'models'
+logs_dir: 'log/logs'
+utils_dir: 'src/utils'
+plots_dir: 'results/plots'

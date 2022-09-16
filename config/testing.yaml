@@ -1,0 +1,3 @@
+test_main:
+  img_size: [ 320, 512 ]
+  model_name: "Unet-Mobilenet_v2_mIoU-0.773.pt"

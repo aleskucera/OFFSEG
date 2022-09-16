@@ -1,0 +1,112 @@
+dataset_labels:
+  '0': void
+  '1': traversable
+  '2': non-traversable
+  '3': obstacle
+  '4': sky
+
+dataset_color_map:
+  '0': [ 0, 0, 0 ]
+  '1': [ 224, 238, 198 ]
+  '2': [ 194, 168, 62 ]
+  '3': [ 36, 62, 54 ]
+  '4': [ 241, 247, 237 ]
+
+dataset_mean: [ 0.448, 0.493, 0.464 ]
+dataset_std: [ 0.227, 0.238, 0.273 ]
+
+rellis_label_map:
+  '0': 0 # "void"
+  '1': 1 # "dirt"
+  '3': 1 # "grass"
+  '4': 3 # "tree"
+  '5': 3 # "pole"
+  '6': 2 # "water"
+  '7': 4 # "sky"
+  '8': 3 # "vehicle"
+  '9': 3 # "object"
+  '10': 1 # "asphalt"
+  '12': 3 # "building"
+  '15': 3 # "log"
+  '17': 3 # "person"
+  '18': 3 # "fence"
+  '19': 2 # "bush"
+  '23': 1 # "concrete"
+  '27': 3 # "barrier"
+  '31': 1 # "puddle"
+  '33': 1 # "mud"
+  '34': 3 # "rubble"
+
+rugd_label_map:
+  '0': 0 # "void"
+  '1': 1 # "dirt"
+  '2': 1 # sand
+  '3': 1 # "grass"
+  '4': 3 # "tree"
+  '5': 3 # "pole"
+  '6': 2 # "water"
+  '7': 4 # "sky"
+  '8': 3 # "vehicle"
+  '9': 3 # "object"
+  '10': 1 # "asphalt"
+  '11': 1 # road
+  '12': 3 # "building"
+  '13': 1 # mulch
+  '14': 1 # "rock-bed"
+  '15': 3 # "log"
+  '16': 3 # bicycle
+  '17': 3 # "person"
+  '18': 3 # "fence"
+  '19': 2 # "bush"
+  '20': 3 # sign
+  '21': 3 # rock
+  '22': 1 # bridge
+  '23': 1 # "concrete"
+  '24': 3 # picnic table
+
+rugd_color_map:
+  '0': [ 0, 0, 0 ] # "void"
+  '1': [ 108, 64, 20 ] # "dirt"
+  '2': [ 255, 229, 204 ] # sand
+  '3': [ 0, 102, 0 ] # "grass"
+  '4': [ 0, 255, 0 ] # "tree"
+  '5': [ 0, 153, 153 ] # "pole"
+  '6': [ 0, 128, 255 ] # "water"
+  '7': [ 0, 0, 255 ] # "sky"
+  '8': [ 255, 255, 0 ] # "vehicle"
+  '9': [ 255, 0, 127 ] # "object"
+  '10': [ 64, 64, 64 ] # "asphalt"
+  '11': [ 255, 128, 0 ] # road
+  '12': [ 255, 0, 0 ] # "building"
+  '13': [ 153, 76, 0 ] # mulch
+  '14': [ 102, 102, 0 ] # "rock-bed"
+  '15': [ 102, 0, 0 ] # "log"
+  '16': [ 0, 255, 128 ] # bicycle
+  '17': [ 204, 153, 255 ] # "person"
+  '18': [ 102, 0, 204 ] # "fence"
+  '19': [ 255, 153, 204 ] # "bush"
+  '20': [ 0, 102, 102 ] # sign
+  '21': [ 153, 204, 255 ] # rock
+  '22': [ 102, 255, 255 ] # bridge
+  '23': [ 101, 101, 101 ] # "concrete"
+  '24': [ 114, 85, 47 ] # picnic table
+
+rugd_directory_map:
+  'creek': '00005'
+  'park-1': '00006'
+  'park-2': '00007'
+  'park-8': '00008'
+  'trail': '00009'
+  'trail-3': '00010'
+  'trail-4': '00011'
+  'trail-5': '00012'
+  'trail-6': '00013'
+  'trail-7': '00014'
+  'trail-9': '00015'
+  'trail-10': '00016'
+  'trail-11': '00017'
+  'trail-12': '00018'
+  'trail-13': '00019'
+  'trail-14': '00020'
+  'trail-15': '00021'
+  'village': '00022'
