@@ -13,4 +13,4 @@
 # Change limit for opened files
 ulimit -n 100000
 
-singularity run --nv deep_learning_image.sif python src/main.py --action train
+singularity run --nv singularity/deep_learning_image.sif python src/main.py --action train
