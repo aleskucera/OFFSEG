@@ -36,8 +36,16 @@ def train_model(p: dict, save_path: str) -> dict:
     train_loader = DataLoader(train_set, batch_size=p['batch_size'], shuffle=True, num_workers=os.cpu_count() // 2)
     val_loader = DataLoader(val_set, batch_size=p['batch_size'], shuffle=False, num_workers=os.cpu_count() // 2)
 
-    model = smp.Unet('mobilenet_v2', encoder_weights='imagenet', classes=5, activation=None, encoder_depth=5,
-                     decoder_channels=[256, 128, 64, 32, 16])
+    # model = smp.Unet('mobilenet_v2', encoder_weights='imagenet', classes=5, activation=None, encoder_depth=5,
+    #                  decoder_channels=[256, 128, 64, 32, 16])
+
+    model = smp.Unet(
+        encoder_name="resnet34",  # choose encoder, e.g. mobilenet_v2 or efficientnet-b7
+        encoder_weights="imagenet",  # use `imagenet` pre-trained weights for encoder initialization
+        in_channels=3,  # model input channels (1 for gray-scale images, 3 for RGB, etc.)
+        classes=5,  # model output channels (number of classes in your dataset)
+    )
+
     model.to(device)
     torch.cuda.empty_cache()
 
@@ -148,7 +156,7 @@ def train_model(p: dict, save_path: str) -> dict:
                         f"Time: {time.time() - since:.2f} \n")
 
     logger.info(f'Total time: {(time.time() - fit_time) / 60:.2f} m')
-    torch.save(model, os.path.join(save_path, f'Unet-Mobilenet2.pt'))
+    torch.save(model, os.path.join(save_path, f'Resnet34.pt'))
     return history
 
 
