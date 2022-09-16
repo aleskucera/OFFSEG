@@ -9,7 +9,7 @@ from torchvision import transforms as T
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset
 
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
 from src.utils import visualize, convert_color
 from config import Config
 
