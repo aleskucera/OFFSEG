@@ -26,13 +26,13 @@ def main():
     # Parse arguments
     parser = argparse.ArgumentParser(description='Optional app description')
     parser.add_argument('--action', type=str, default='train', help='Action to perform: train or test')
-    parser.add_argument('--develop', action='store_true', default='true',
-                        help='Optional argument if you want to run in develop mode')
+    parser.add_argument('--dev', action='store_true',
+                        help='Optional argument if you want to run in development mode')
     args = parser.parse_args()
 
     # Train or test the model
     if args.action == "train":
-        if args.develop:
+        if args.dev:
             parameters = cfg['train_params_dev']
         else:
             parameters = cfg['train_params']
