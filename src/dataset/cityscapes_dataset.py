@@ -6,7 +6,7 @@ import numpy as np
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
 from config import Config
-from base_dataset import BaseDataset
+from .base_dataset import BaseDataset
 from src.utils import visualize, tensor_to_image, mask_to_color
 
 cfg = Config()
