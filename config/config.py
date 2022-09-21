@@ -44,10 +44,10 @@ class Config(object):
         self.cityscapes_config = self.load_config(cityscapes_config)
 
         # check if project structure exists, set paths to absolute paths and check if they exist
-        for key, value in self.project_structure.items():
-            absolute_path = self.absolute_path(value)
-            assert os.path.exists(absolute_path), f"Path '{absolute_path}' does not exist"
-            self.project_structure[key] = absolute_path
+        # for key, value in self.project_structure.items():
+        #     absolute_path = self.absolute_path(value)
+        #     assert os.path.exists(absolute_path), f"Path '{absolute_path}' does not exist"
+        #     self.project_structure[key] = absolute_path
 
     @staticmethod
     def absolute_path(path):
