@@ -1,17 +1,41 @@
 import os
-import cv2
 import time
-import torch
 import logging
+
+import cv2
+import torch
 import numpy as np
 import torch.nn as nn
 import albumentations as A
 import segmentation_models_pytorch as smp
 
 from tqdm import tqdm
-from dataset import OFFSEGDataset
-from torch.utils.data import DataLoader
+from dataset import RellisDataset, RugdDataset, CityscapesDataset
+from torch.utils.data import DataLoader, ConcatDataset
 from utils import mIoU, pixel_accuracy
+
+
+def create_dataset(rellis_path, rugd_path, cityscapes_path, split, size=None, transform=None):
+    rellis_dataset = RellisDataset(path=rellis_path, split=split, size=size, transform=transform)
+    rugd_dataset = RugdDataset(path=rugd_path, split=split, size=size, transform=transform)
+    cityscapes_dataset = CityscapesDataset(path=cityscapes_path, split=split, size=size, transform=transform)
+    return ConcatDataset([rellis_dataset, rugd_dataset, cityscapes_dataset])
+
+
+def calculate_mean_std(dataset):
+    mean = 0.
+    std = 0.
+    nb_samples = 0.
+    for data in tqdm(dataset):
+        batch_samples = data[0].size(0)
+        data = data[0].view(batch_samples, data[0].size(1), -1)
+        mean += data.mean(2).sum(0)
+        std += data.std(2).sum(0)
+        nb_samples += batch_samples
+
+    mean /= nb_samples
+    std /= nb_samples
+    return mean, std
 
 
 def train_model(p: dict, save_path: str) -> dict:
@@ -29,8 +53,14 @@ def train_model(p: dict, save_path: str) -> dict:
                        A.GridDistortion(p=0.2)])
 
     # Datasets
-    train_set = OFFSEGDataset('train', size=p['dataset_size'], transform=t_train)
-    val_set = OFFSEGDataset('val', size=p['dataset_size'], transform=t_val)
+    # train_set = OFFSEGDataset('train', size=p['dataset_size'], transform=t_train)
+    # val_set = OFFSEGDataset('val', size=p['dataset_size'], transform=t_val)
+    train_set = create_dataset(p['rellis_path'], p['rugd_path'], p['cityscapes_path'],
+                               'train', size=p['dataset_size'], transform=t_train)
+    print(len(train_set))
+    val_set = create_dataset(p['rellis_path'], p['rugd_path'], p['cityscapes_path'],
+                             'val', size=p['dataset_size'], transform=t_val)
+    print(len(val_set))
 
     # Loaders
     train_loader = DataLoader(train_set, batch_size=p['batch_size'], shuffle=True, num_workers=os.cpu_count() // 2)
@@ -43,7 +73,7 @@ def train_model(p: dict, save_path: str) -> dict:
         encoder_name="resnet34",  # choose encoder, e.g. mobilenet_v2 or efficientnet-b7
         encoder_weights="imagenet",  # use `imagenet` pre-trained weights for encoder initialization
         in_channels=3,  # model input channels (1 for gray-scale images, 3 for RGB, etc.)
-        classes=5,  # model output channels (number of classes in your dataset)
+        classes=6,  # model output channels (number of classes in your dataset)
     )
 
     model.to(device)

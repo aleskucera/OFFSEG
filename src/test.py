@@ -17,7 +17,7 @@ cfg = Config()
 
 def test_model():
     # Load the model
-    model = torch.load('../models/Unet-Mobilenet_v2_mIoU-0.773.pt')
+    model = torch.load('../models/Resnet34.pt')
     model.eval()
 
     # Load the dataset

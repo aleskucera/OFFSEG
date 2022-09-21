@@ -43,7 +43,7 @@ cityscapes_dataset:
       - 0
     id: 4
     train_id: 255
-    priseg_id: 0
+    priseg_id: 3
   dynamic:
     category: void
     color:
@@ -52,7 +52,7 @@ cityscapes_dataset:
       - 0
     id: 5
     train_id: 255
-    priseg_id: 0
+    priseg_id: 3
   ground:
     category: void
     color:
@@ -194,9 +194,9 @@ cityscapes_dataset:
       - 107
       - 142
       - 35
-    id: 2_i
+    id: 21
     train_id: 8
-    priseg_id: 2
+    priseg_id: 3
   terrain:
     category: nature
     color:

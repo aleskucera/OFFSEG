@@ -12,6 +12,26 @@ dataset_color_map:
   '3': [ 36, 62, 54 ]
   '4': [ 241, 247, 237 ]
 
+priseg_dataset:
+  void:
+    color: [ 0, 0, 0 ]
+    id: 0
+  traversable:
+    color: [ 224, 238, 198 ]
+    id: 1
+  non-traversable:
+    color: [ 194, 168, 62 ]
+    id: 2
+  obstacle:
+    color: [ 36, 62, 54 ]
+    id: 3
+  sky:
+    color: [ 241, 247, 237 ]
+    id: 4
+  road:
+    color: [ 255, 128, 0 ]
+    id: 5
+
 dataset_mean: [ 0.448, 0.493, 0.464 ]
 dataset_std: [ 0.227, 0.238, 0.273 ]
 

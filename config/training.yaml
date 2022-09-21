@@ -6,12 +6,18 @@ train_params:
   dataset_size: null      # null means all
   image_size: [ 320, 512 ]
   ignore_labels: [ 0 ]
+  rellis_path: '/home/kuceral4/Datasets/Rellis_3D'
+  rugd_path: '/home/kuceral4/Datasets/RUGD'
+  cityscapes_path: '/home/kuceral4/Datasets/cityscapes'
 
 train_params_dev:
   learning_rate: 0.001    # 1e-3
   weight_decay: 0.0001    # 1e-4
-  n_epochs: 10
+  n_epochs: 20
   batch_size: 1
   dataset_size: 100
   image_size: [ 320, 512 ]
   ignore_labels: [ 0 ]
+  rellis_path: '/home/ales/Datasets/Rellis_3D'
+  rugd_path: '/home/ales/Datasets/RUGD'
+  cityscapes_path: '/home/ales/Datasets/cityscapes'

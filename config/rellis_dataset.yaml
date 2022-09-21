@@ -28,7 +28,7 @@ rellis_dataset:
     priseg_id: 3
   asphalt:
     id: 10
-    priseg_id: 1
+    priseg_id: 5
   building:
     id: 12
     priseg_id: 3
@@ -46,7 +46,7 @@ rellis_dataset:
     priseg_id: 2
   concrete:
     id: 23
-    priseg_id: 1
+    priseg_id: 5
   barrier:
     id: 27
     priseg_id: 3

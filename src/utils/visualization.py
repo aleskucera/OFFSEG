@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
+from torchvision import transforms as T
 
 
 def visualize(**images):
@@ -45,3 +46,28 @@ def convert_label(label, inverse=False, label_mapping=None):
         for k, v in label_mapping.items():
             temp[label == k] = v
     return temp
+
+
+def mask_to_color(mask, dataset_config):
+    # Map label to color
+    rgb_mask = np.zeros((mask.shape[0], mask.shape[1], 3), dtype=np.uint8)
+    for v in dataset_config.values():
+        rgb_mask[mask == v['id']] = v['color']
+    return rgb_mask
+
+
+def color_to_mask(color_mask, dataset_config):
+    mask = np.zeros((color_mask.shape[0], color_mask.shape[1]), dtype=np.uint8)
+    for v in dataset_config.values():
+        mask[np.where(np.all(color_mask == v['color'], axis=-1))] = v['id']
+    return mask
+
+
+def tensor_to_image(tensor: torch.Tensor, mean: list, std: list):
+    inv_std = [1 / s for s in std]
+    zero_mean = [0 for _ in mean]
+    neg_mean = [-m for m in mean]
+    t = T.Compose([T.Normalize(zero_mean, inv_std),
+                   T.Normalize(neg_mean, [1, 1, 1]),
+                   T.ToPILImage()])
+    return t(tensor)
