@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
-# import test
+import test
 import train
 import logging
 import argparse
@@ -41,8 +41,7 @@ def main():
         plot_score(history, save_path=cfg["plots_dir"])
         plot_acc(history, save_path=cfg["plots_dir"])
     elif args.action == "test":
-        # test.test_model()
-        pass
+        test.test_model(p=cfg['test_params'])
 
 
 if __name__ == '__main__':

@@ -22,19 +22,14 @@ def create_dataset(rellis_path, rugd_path, cityscapes_path, split, size=None, tr
     return ConcatDataset([rellis_dataset, rugd_dataset, cityscapes_dataset])
 
 
-def calculate_mean_std(dataset):
-    mean = 0.
-    std = 0.
-    nb_samples = 0.
-    for data in tqdm(dataset):
-        batch_samples = data[0].size(0)
-        data = data[0].view(batch_samples, data[0].size(1), -1)
-        mean += data.mean(2).sum(0)
-        std += data.std(2).sum(0)
-        nb_samples += batch_samples
-
-    mean /= nb_samples
-    std /= nb_samples
+def calculate_mean_std(dataloader):
+    channels_sum, channels_squared_sum, num_batches = 0, 0, 0
+    for image, _ in tqdm(dataloader):
+        channels_sum += torch.mean(image, dim=[0, 2, 3])
+        channels_squared_sum += torch.mean(image ** 2, dim=[0, 2, 3])
+        num_batches += 1
+    mean = channels_sum / num_batches
+    std = (channels_squared_sum / num_batches - mean ** 2) ** 0.5
     return mean, std
 
 
@@ -53,19 +48,14 @@ def train_model(p: dict, save_path: str) -> dict:
                        A.GridDistortion(p=0.2)])
 
     # Datasets
-    # train_set = OFFSEGDataset('train', size=p['dataset_size'], transform=t_train)
-    # val_set = OFFSEGDataset('val', size=p['dataset_size'], transform=t_val)
     train_set = create_dataset(p['rellis_path'], p['rugd_path'], p['cityscapes_path'],
                                'train', size=p['dataset_size'], transform=t_train)
-    print(len(train_set))
     val_set = create_dataset(p['rellis_path'], p['rugd_path'], p['cityscapes_path'],
                              'val', size=p['dataset_size'], transform=t_val)
-    print(len(val_set))
 
     # Loaders
     train_loader = DataLoader(train_set, batch_size=p['batch_size'], shuffle=True, num_workers=os.cpu_count() // 2)
     val_loader = DataLoader(val_set, batch_size=p['batch_size'], shuffle=False, num_workers=os.cpu_count() // 2)
-
     # model = smp.Unet('mobilenet_v2', encoder_weights='imagenet', classes=5, activation=None, encoder_depth=5,
     #                  decoder_channels=[256, 128, 64, 32, 16])
 
@@ -88,7 +78,7 @@ def train_model(p: dict, save_path: str) -> dict:
     decrease = 1
     not_improve = 0
 
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(ignore_index=0)
     optimizer = torch.optim.AdamW(model.parameters(), lr=p['learning_rate'], weight_decay=p['weight_decay'])
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, p['learning_rate'], epochs=p['n_epochs'],
                                                     steps_per_epoch=len(train_loader))
@@ -161,7 +151,7 @@ def train_model(p: dict, save_path: str) -> dict:
                 if decrease % 5 == 0:
                     logger.info('Saving model...')
                     torch.save(model, os.path.join(save_path,
-                                                   f'Unet-Mobilenet_v2_mIoU-{val_iou_score / len(val_loader):.3f}.pt'))
+                                                   f'Resnet34-{val_iou_score / len(val_loader):.3f}.pt'))
 
             if (val_loss / len(val_loader)) > min_loss:
                 not_improve += 1

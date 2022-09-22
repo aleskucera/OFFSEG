@@ -1,3 +1,6 @@
-test_main:
+test_params:
   img_size: [ 320, 512 ]
-  model_name: "Unet-Mobilenet_v2_mIoU-0.773.pt"
+  model_name: "Resnet34.pt"
+  rellis_path: '/home/ales/Datasets/Rellis_3D'
+  rugd_path: '/home/ales/Datasets/RUGD'
+  cityscapes_path: '/home/ales/Datasets/cityscapes'

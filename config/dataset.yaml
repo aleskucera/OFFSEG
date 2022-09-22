@@ -32,8 +32,11 @@ priseg_dataset:
     color: [ 255, 128, 0 ]
     id: 5
 
-dataset_mean: [ 0.448, 0.493, 0.464 ]
-dataset_std: [ 0.227, 0.238, 0.273 ]
+dataset_mean: [ 0.4143, 0.4573, 0.4258 ]
+dataset_std: [ 0.2539, 0.2708, 0.2882 ]
+
+#dataset_mean: [ 0.448, 0.493, 0.464 ]
+#dataset_std: [ 0.227, 0.238, 0.273 ]
 
 rellis_label_map:
   '0': 0 # "void"

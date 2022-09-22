@@ -196,7 +196,7 @@ cityscapes_dataset:
       - 35
     id: 21
     train_id: 8
-    priseg_id: 3
+    priseg_id: 0
   terrain:
     category: nature
     color:
