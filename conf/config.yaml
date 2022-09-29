@@ -1,0 +1,12 @@
+defaults:
+  - _self_
+  - ds: default
+  - model: resnet34
+  - train: default
+  - test: default
+  - path: default
+  - cityscapes: default
+  - rellis: default
+  - rugd: default
+
+action: train

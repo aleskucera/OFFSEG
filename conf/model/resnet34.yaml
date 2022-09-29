@@ -1,0 +1,4 @@
+num_layers: 34
+num_classes: 19
+pretrained: true
+name: resnet34

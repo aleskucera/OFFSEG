@@ -1,0 +1,175 @@
+void:
+  color:
+    - 0
+    - 0
+    - 0
+  id: 0
+  priseg_id: 0
+dirt:
+  color:
+    - 108
+    - 64
+    - 20
+  id: 1
+  priseg_id: 1
+sand:
+  color:
+    - 255
+    - 229
+    - 204
+  id: 2
+  priseg_id: 1
+grass:
+  color:
+    - 0
+    - 102
+    - 0
+  id: 3
+  priseg_id: 1
+tree:
+  color:
+    - 0
+    - 255
+    - 0
+  id: 4
+  priseg_id: 3
+pole:
+  color:
+    - 0
+    - 153
+    - 153
+  id: 5
+  priseg_id: 3
+water:
+  color:
+    - 0
+    - 128
+    - 255
+  id: 6
+  priseg_id: 2
+sky:
+  color:
+    - 0
+    - 0
+    - 255
+  id: 7
+  priseg_id: 4
+vehicle:
+  color:
+    - 255
+    - 255
+    - 0
+  id: 8
+  priseg_id: 3
+object:
+  color:
+    - 255
+    - 0
+    - 127
+  id: 9
+  priseg_id: 3
+asphalt:
+  color:
+    - 64
+    - 64
+    - 64
+  id: 10
+  priseg_id: 5
+road:
+  color:
+    - 255
+    - 128
+    - 0
+  id: 11
+  priseg_id: 1
+building:
+  color:
+    - 255
+    - 0
+    - 0
+  id: 12
+  priseg_id: 3
+mulch:
+  color:
+    - 153
+    - 76
+    - 0
+  id: 13
+  priseg_id: 1
+rock-bed:
+  color:
+    - 102
+    - 102
+    - 0
+  id: 14
+  priseg_id: 1
+log:
+  color:
+    - 102
+    - 0
+    - 0
+  id: 15
+  priseg_id: 3
+bicycle:
+  color:
+    - 0
+    - 255
+    - 128
+  id: 16
+  priseg_id: 3
+person:
+  color:
+    - 204
+    - 153
+    - 255
+  id: 17
+  priseg_id: 3
+fence:
+  color:
+    - 102
+    - 0
+    - 204
+  id: 18
+  priseg_id: 3
+bush:
+  color:
+    - 255
+    - 153
+    - 204
+  id: 19
+  priseg_id: 2
+sign:
+  color:
+    - 0
+    - 102
+    - 102
+  id: 20
+  priseg_id: 3
+rock:
+  color:
+    - 153
+    - 204
+    - 255
+  id: 21
+  priseg_id: 3
+bridge:
+  color:
+    - 102
+    - 255
+    - 255
+  id: 22
+  priseg_id: 1
+concrete:
+  color:
+    - 101
+    - 101
+    - 101
+  id: 23
+  priseg_id: 5
+picnic_table:
+  color:
+    - 114
+    - 85
+    - 47
+  id: 24
+  priseg_id: 3

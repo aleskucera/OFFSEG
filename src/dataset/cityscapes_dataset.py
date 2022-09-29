@@ -1,31 +1,20 @@
 import os
-import sys
-
-import numpy as np
-
-sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
-from config import Config
 from .base_dataset import BaseDataset
-from src.utils import visualize, tensor_to_image, mask_to_color
-
-cfg = Config()
-
-CITYSCAPES_PATH = '/home/ales/Datasets/cityscapes'
 
 
 class CityscapesDataset(BaseDataset):
-    def __init__(self, path, split=None, size=None, transform=None):
+    def __init__(self, path, split=None, size=None, transform=None, mean=None, std=None, color_map=None):
         self.ds_str = {'image_dir': 'leftImg8bit',
                        'label_dir': 'gtFine',
                        'image_end': 'leftImg8bit',
                        'label_end': 'gtFine_labelIds',
                        'ext': '.png'}
 
-        super().__init__(path, 'cityscapes_dataset', split, size, transform)
+        super().__init__(path, 'cityscapes', split, size, transform, mean=mean, std=std, color_map=color_map)
 
-        self.images, self.labels = self.read_files()
+        self.images, self.labels = self._read_files()
 
-    def read_files(self):
+    def _read_files(self):
         images, labels = [], []
         images_path = os.path.join(self.path, self.ds_str['image_dir'], self.split)
 
@@ -50,22 +39,3 @@ class CityscapesDataset(BaseDataset):
             images = images[:self.size // 3]
             labels = labels[:self.size // 3]
         return images, labels
-
-
-def cityscapes_demo():
-    # Create dataset
-    dataset = CityscapesDataset(path=CITYSCAPES_PATH, split='train')
-    print(len(dataset))
-
-    for i in range(5):
-        # Get sample
-        img, mask = dataset[i]
-        img = tensor_to_image(img, cfg['dataset_mean'], cfg['dataset_std'])
-
-        mask = mask_to_color(mask, cfg['priseg_dataset'])
-        # Visualize sample
-        visualize(image=img, mask=mask)
-
-
-if __name__ == "__main__":
-    cityscapes_demo()

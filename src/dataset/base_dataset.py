@@ -1,6 +1,3 @@
-import os
-import sys
-
 import cv2
 import torch
 import numpy as np
@@ -9,19 +6,16 @@ from torch.utils.data import Dataset
 from torchvision import transforms as T
 from sklearn.model_selection import train_test_split
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
-from config import Config
 from src.utils import color_to_mask
-
-cfg = Config()
 
 
 class BaseDataset(Dataset):
-    def __init__(self, path, dataset, split='train', size=None, transform=None):
+    def __init__(self, path, dataset, split='train', size=None,
+                 transform=None, mean=None, std=None, color_map=None):
 
         # Check arguments
         assert split in ['train', 'val', 'test']
-        assert dataset in ['rellis_dataset', 'cityscapes_dataset', 'rugd_dataset']
+        assert dataset in ['rellis', 'cityscapes', 'rugd']
 
         # Attributes
         self.path = path
@@ -29,10 +23,11 @@ class BaseDataset(Dataset):
         self.split = split
         self.dataset = dataset
         self.transform = transform
+        self.color_map = color_map
 
         # Parameters
-        self.std = cfg['dataset_std']
-        self.mean = cfg['dataset_mean']
+        self.std = mean
+        self.mean = std
 
         # Data
         self.images = []
@@ -48,15 +43,15 @@ class BaseDataset(Dataset):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         # Read label. Labels in RUGD are in color format
-        if self.dataset == 'rugd_dataset':
+        if self.dataset == 'rugd':
             mask = cv2.imread(self.labels[idx])
             mask = cv2.cvtColor(mask, cv2.COLOR_BGR2RGB)
-            mask = color_to_mask(mask, cfg[self.dataset])
+            mask = color_to_mask(mask, self.color_map)
         else:
             mask = cv2.imread(self.labels[idx], cv2.IMREAD_GRAYSCALE)
 
         # Map labels
-        mask = self.map_labels(mask, self.dataset)
+        mask = self.map_labels(mask, self.color_map)
 
         # Apply transformations
         if self.transform is not None:
@@ -88,12 +83,9 @@ class BaseDataset(Dataset):
         elif self.split == 'test':
             self.images, self.labels = X_test, y_test
 
-        print(
-            f"Dataset: {self.dataset} - Split: {self.split} - Images: {len(self.images)} - Labels: {len(self.labels)}")
-
     @staticmethod
-    def map_labels(label: np.ndarray, dataset_name: str):
+    def map_labels(label: np.ndarray, color_map: dict) -> np.ndarray:
         # Map label to new label
-        for v in cfg[dataset_name].values():
+        for v in color_map.values():
             label[label == v['id']] = v['priseg_id']
         return label

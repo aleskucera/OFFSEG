@@ -1,0 +1,60 @@
+void:
+  id: 0
+  priseg_id: 0
+dirt:
+  id: 1
+  priseg_id: 1
+grass:
+  id: 3
+  priseg_id: 1
+tree:
+  id: 4
+  priseg_id: 3
+pole:
+  id: 5
+  priseg_id: 3
+water:
+  id: 6
+  priseg_id: 2
+sky:
+  id: 7
+  priseg_id: 4
+vehicle:
+  id: 8
+  priseg_id: 3
+object:
+  id: 9
+  priseg_id: 3
+asphalt:
+  id: 10
+  priseg_id: 5
+building:
+  id: 12
+  priseg_id: 3
+log:
+  id: 15
+  priseg_id: 3
+person:
+  id: 17
+  priseg_id: 3
+fence:
+  id: 18
+  priseg_id: 3
+bush:
+  id: 19
+  priseg_id: 2
+concrete:
+  id: 23
+  priseg_id: 5
+barrier:
+  id: 27
+  priseg_id: 3
+puddle:
+  id: 31
+  priseg_id: 1
+mud:
+  id: 33
+  priseg_id: 1
+rubble:
+  id: 34
+  priseg_id: 3

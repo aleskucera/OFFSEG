@@ -1,0 +1,2 @@
+img_size: [ 320, 512 ]
+model_name: "Resnet34.pt"
